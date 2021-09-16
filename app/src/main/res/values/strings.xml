@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MealDash</string>
+    <string name="login_iv_content_description">login screen logo</string>
 </resources>

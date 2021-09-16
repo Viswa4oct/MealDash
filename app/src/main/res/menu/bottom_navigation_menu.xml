@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/restaurantsFragment"
+        android:orderInCategory="1"
+        android:icon="@drawable/restaurant"
+        android:enabled="true"
+        app:showAsAction="always"
+        android:title="Restaurants"/>
+    <item
+        android:id="@+id/searchFragment"
+        android:orderInCategory="2"
+        android:icon="@drawable/search"
+        android:enabled="true"
+        app:showAsAction="always"
+        android:title="Search"/>
+    <item
+        android:id="@+id/cartFragment"
+        android:orderInCategory="3"
+        android:icon="@drawable/cart"
+        android:enabled="true"
+        app:showAsAction="always"
+        android:title="Cart"/>
+</menu>
