@@ -1,26 +1,23 @@
 package com.bitswilpg2.mealdash.screens
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
-import android.location.Address
-import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.location.LocationCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.bitswilpg2.mealdash.R
 import com.bitswilpg2.mealdash.databinding.FragmentRegisterBinding
-import android.location.Geocoder
-import java.util.*
+import com.bitswilpg2.mealdash.network.models.CustomerDetails
+import com.bitswilpg2.mealdash.network.repository.RegisterRepository
+import com.bitswilpg2.mealdash.network.services.AuthenticationRetrofitService
+import com.bitswilpg2.mealdash.viewmodels.RegisterViewModel
+import com.bitswilpg2.mealdash.viewmodels.factory.RegisterViewModelFactory
 
 
 /**
@@ -34,6 +31,10 @@ class RegisterFragment: Fragment() {
     private lateinit var locationManager: LocationManager
     private var longitude: Double = 0.0
     private var latitude: Double = 0.0
+    private lateinit var registerViewModel: RegisterViewModel
+    private val registerService = AuthenticationRetrofitService.getInstance()
+    private val registerRepository = RegisterRepository(registerService)
+    private lateinit var customerDetails: CustomerDetails
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,41 +48,25 @@ class RegisterFragment: Fragment() {
                 requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         }
 
+        customerDetails = CustomerDetails("","","","","","","")
+        registerViewModel = ViewModelProvider(this, RegisterViewModelFactory(registerRepository, customerDetails, requireContext(), locationManager)).get(RegisterViewModel::class.java)
+        binding.registerViewModel = registerViewModel
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        fetchCityUsingGPSData()
-
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
 
-        val l = { _: View -> } // empty listener so that touch effects are visible
         binding.btnRegister.setOnClickListener {
             navController.navigate(R.id.action_registerFragment_to_loginFragment)
         }
         binding.btnClose.setOnClickListener {
             navController.navigate(R.id.action_registerFragment_to_loginFragment)
         }
-    }
 
-    private fun fetchCityUsingGPSData() {
-        if (ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED)
-                return
-        else {
-            val location: Location =
-                locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)!!
-            longitude = location.longitude
-            latitude = location.latitude
-        }
-        val geocoder = Geocoder(requireContext(), Locale.getDefault())
-        val addresses: List<Address> = geocoder.getFromLocation(latitude, longitude, 1)
-        val cityName = addresses[0].locality
-
-        binding.edtLocation.setText(cityName)
+        registerViewModel.fetchCityUsingGPSData()
     }
 }

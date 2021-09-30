@@ -14,10 +14,20 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.bitswilpg2.mealdash.R
 import com.bitswilpg2.mealdash.databinding.FragmentLoginBinding
+import com.bitswilpg2.mealdash.network.models.CustomerDetails
+import com.bitswilpg2.mealdash.network.models.LoginDetails
+import com.bitswilpg2.mealdash.network.repository.LoginRepository
+import com.bitswilpg2.mealdash.network.repository.RegisterRepository
+import com.bitswilpg2.mealdash.network.services.AuthenticationRetrofitService
+import com.bitswilpg2.mealdash.viewmodels.LoginViewModel
+import com.bitswilpg2.mealdash.viewmodels.RegisterViewModel
+import com.bitswilpg2.mealdash.viewmodels.factory.LoginViewModelFactory
+import com.bitswilpg2.mealdash.viewmodels.factory.RegisterViewModelFactory
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 
@@ -32,6 +42,10 @@ class LoginFragment : Fragment() {
     private lateinit var navController: NavController
     private lateinit var username: TextInputEditText
     private lateinit var password: TextInputEditText
+    private lateinit var loginViewModel: LoginViewModel
+    private val loginService = AuthenticationRetrofitService.getInstance()
+    private val loginRepository = LoginRepository(loginService)
+    private lateinit var loginDetails: LoginDetails
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -51,6 +65,11 @@ class LoginFragment : Fragment() {
     ): View {
         binding = DataBindingUtil.inflate(layoutInflater, R.layout.fragment_login, container, false)
         layout = binding.loginLayout
+
+        navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+        loginDetails = LoginDetails("","","")
+        loginViewModel = ViewModelProvider(this, LoginViewModelFactory(loginRepository, loginDetails, navController)).get(LoginViewModel::class.java)
+        binding.loginViewModel = loginViewModel
 
         return binding.root
     }
@@ -113,21 +132,20 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
         username = binding.edtUserName
         password = binding.edtPassword
 
-        val l = { _: View -> } // empty listener so that touch effects are visible
-        binding.btnLogin.setOnClickListener {
-            if (username.text!!.toString() == "viswa" && password.text!!.toString() == "0000") {
-                navController.navigate(R.id.action_loginFragment_to_restaurantsFragment)
-            } else {
-                Toast.makeText(activity, "Login Failed!", Toast.LENGTH_SHORT).show()
-            }
-        }
         binding.btnSignUp.setOnClickListener {
             navController.navigate(R.id.action_loginFragment_to_registerFragment)
         }
+
+        loginViewModel.loading.observe(viewLifecycleOwner, {
+            if (it) {
+                binding.progressDialog.visibility = View.VISIBLE
+            } else {
+                binding.progressDialog.visibility = View.GONE
+            }
+        })
     }
 
     override fun onStart() {
