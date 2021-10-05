@@ -1,14 +1,13 @@
 package com.bitswilpg2.mealdash.screens
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import android.widget.ProgressBar
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -19,15 +18,12 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.bitswilpg2.mealdash.R
 import com.bitswilpg2.mealdash.databinding.FragmentLoginBinding
-import com.bitswilpg2.mealdash.network.models.CustomerDetails
 import com.bitswilpg2.mealdash.network.models.LoginDetails
 import com.bitswilpg2.mealdash.network.repository.LoginRepository
-import com.bitswilpg2.mealdash.network.repository.RegisterRepository
 import com.bitswilpg2.mealdash.network.services.AuthenticationRetrofitService
 import com.bitswilpg2.mealdash.viewmodels.LoginViewModel
-import com.bitswilpg2.mealdash.viewmodels.RegisterViewModel
 import com.bitswilpg2.mealdash.viewmodels.factory.LoginViewModelFactory
-import com.bitswilpg2.mealdash.viewmodels.factory.RegisterViewModelFactory
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 
@@ -46,6 +42,7 @@ class LoginFragment : Fragment() {
     private val loginService = AuthenticationRetrofitService.getInstance()
     private val loginRepository = LoginRepository(loginService)
     private lateinit var loginDetails: LoginDetails
+    private lateinit var alertDialogBuilder: MaterialAlertDialogBuilder
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -112,7 +109,7 @@ class LoginFragment : Fragment() {
         }
     }
 
-    fun View.showSnackbar(
+    private fun View.showSnackbar(
         view: View,
         msg: String,
         length: Int,
@@ -134,6 +131,7 @@ class LoginFragment : Fragment() {
 
         username = binding.edtUserName
         password = binding.edtPassword
+        alertDialogBuilder = MaterialAlertDialogBuilder(requireContext())
 
         binding.btnSignUp.setOnClickListener {
             navController.navigate(R.id.action_loginFragment_to_registerFragment)
@@ -143,8 +141,12 @@ class LoginFragment : Fragment() {
             if (it) {
                 binding.progressDialog.visibility = View.VISIBLE
             } else {
-                binding.progressDialog.visibility = View.GONE
+                binding.progressDialog.visibility = View.INVISIBLE
             }
+        })
+
+        loginViewModel.errorMessage.observe(viewLifecycleOwner, {
+            alertDialogBuilder.setMessage(it).show()
         })
     }
 

@@ -3,6 +3,8 @@ package com.bitswilpg2.mealdash.screens
 import android.content.Context
 import android.location.LocationManager
 import android.os.Bundle
+import android.text.InputFilter
+import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +20,9 @@ import com.bitswilpg2.mealdash.network.repository.RegisterRepository
 import com.bitswilpg2.mealdash.network.services.AuthenticationRetrofitService
 import com.bitswilpg2.mealdash.viewmodels.RegisterViewModel
 import com.bitswilpg2.mealdash.viewmodels.factory.RegisterViewModelFactory
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 
 /**
@@ -26,15 +31,14 @@ import com.bitswilpg2.mealdash.viewmodels.factory.RegisterViewModelFactory
  */
 class RegisterFragment: Fragment() {
 
-    private lateinit var binding: FragmentRegisterBinding
+    lateinit var binding: FragmentRegisterBinding
     private lateinit var navController: NavController
     private lateinit var locationManager: LocationManager
-    private var longitude: Double = 0.0
-    private var latitude: Double = 0.0
     private lateinit var registerViewModel: RegisterViewModel
     private val registerService = AuthenticationRetrofitService.getInstance()
     private val registerRepository = RegisterRepository(registerService)
     private lateinit var customerDetails: CustomerDetails
+    private lateinit var alertDialogBuilder: MaterialAlertDialogBuilder
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,6 +46,7 @@ class RegisterFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(layoutInflater, R.layout.fragment_register, container, false)
+        navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
 
         if (activity != null) {
             locationManager =
@@ -49,7 +54,7 @@ class RegisterFragment: Fragment() {
         }
 
         customerDetails = CustomerDetails("","","","","","","")
-        registerViewModel = ViewModelProvider(this, RegisterViewModelFactory(registerRepository, customerDetails, requireContext(), locationManager)).get(RegisterViewModel::class.java)
+        registerViewModel = ViewModelProvider(this, RegisterViewModelFactory(registerRepository, customerDetails, requireContext(), locationManager, navController)).get(RegisterViewModel::class.java)
         binding.registerViewModel = registerViewModel
 
         return binding.root
@@ -58,7 +63,7 @@ class RegisterFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+        alertDialogBuilder = MaterialAlertDialogBuilder(requireContext())
 
         binding.btnRegister.setOnClickListener {
             navController.navigate(R.id.action_registerFragment_to_loginFragment)
@@ -68,5 +73,17 @@ class RegisterFragment: Fragment() {
         }
 
         registerViewModel.fetchCityUsingGPSData()
+
+        registerViewModel.loading.observe(viewLifecycleOwner, {
+            if (it) {
+                binding.progressDialog.visibility = View.VISIBLE
+            } else {
+                binding.progressDialog.visibility = View.GONE
+            }
+        })
+
+        registerViewModel.errorMessage.observe(viewLifecycleOwner, {
+            alertDialogBuilder.setMessage(it).show()
+        })
     }
 }

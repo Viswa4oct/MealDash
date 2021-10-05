@@ -65,7 +65,7 @@ class RestaurantViewModel(
     @SuppressLint("MissingPermission")
     fun fetchCityUsingGPSData() {
         val location: Location =
-            locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)!!
+            locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)!!
         this.latitude = location.latitude
         this.longitude = location.longitude
     }

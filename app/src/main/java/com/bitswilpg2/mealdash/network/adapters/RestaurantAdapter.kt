@@ -1,10 +1,12 @@
 package com.bitswilpg2.mealdash.network.adapters
 
 import android.app.Activity
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bitswilpg2.mealdash.R
 import com.bitswilpg2.mealdash.databinding.AdapterRestaurantBinding
@@ -23,13 +25,15 @@ class RestaurantAdapter() : RecyclerView.Adapter<RestaurantViewHolder>() {
     private var latitude:Double = 0.0
     private var longitude:Double = 0.0
     private lateinit var activity: Activity
+    private lateinit var fragment: Fragment
 
-    fun setRestaurants(restaurants: List<RestaurantItem>, latitude: Double, longitude: Double, activity: Activity) {
+    fun setRestaurants(restaurants: List<RestaurantItem>, latitude: Double, longitude: Double, activity: Activity, parentFragment: Fragment) {
         this.restaurantList.clear()
         this.restaurantList = restaurants.toMutableList()
         this.latitude = latitude
         this.longitude = longitude
         this.activity = activity
+        this.fragment = parentFragment
         notifyDataSetChanged()
     }
 
@@ -39,9 +43,19 @@ class RestaurantAdapter() : RecyclerView.Adapter<RestaurantViewHolder>() {
         val binding = AdapterRestaurantBinding.inflate(inflater, parent, false)
         return RestaurantViewHolder(binding, object : RecyclerItemClickListener {
             override fun onItemClick(pos: Int) {
-                Navigation.findNavController(activity, R.id.nav_host_fragment).navigate(R.id.action_restaurantsFragment_to_cartFragment)
-            }
 
+                val currentFragment =
+                    NavHostFragment.findNavController(fragment).currentDestination?.id
+                if (currentFragment == R.id.restaurantsFragment) {
+                    val bundle = Bundle()
+                    bundle.putInt("ResID", restaurantList[pos].id)
+                    Navigation.findNavController(activity, R.id.nav_host_fragment)
+                        .navigate(R.id.action_restaurantsFragment_to_restaurantDetailFragment, bundle)
+                } else if(currentFragment == R.id.searchFragment) {
+                    Navigation.findNavController(activity, R.id.nav_host_fragment)
+                        .navigate(R.id.action_searchFragment_to_restaurantDetailFragment)
+                }
+            }
         })
     }
 

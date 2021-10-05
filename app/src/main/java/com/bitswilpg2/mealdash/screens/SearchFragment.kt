@@ -64,7 +64,7 @@ class SearchFragment : Fragment() {
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
 
         restaurantViewModel.restaurant.observe(viewLifecycleOwner, {
-            restaurantAdapter.setRestaurants(it, restaurantViewModel.latitude, restaurantViewModel.longitude, requireActivity())
+            restaurantAdapter.setRestaurants(it, restaurantViewModel.latitude, restaurantViewModel.longitude, requireActivity(), requireParentFragment())
         })
 
         restaurantViewModel.loading.observe(viewLifecycleOwner, {
@@ -93,11 +93,11 @@ class SearchFragment : Fragment() {
                 }
 
                 if (p0 != "" && searchHistory.size == 0) {
-                    restaurantAdapter.setRestaurants(searchHistory.toList(), restaurantViewModel.latitude, restaurantViewModel.longitude, requireActivity())
+                    restaurantAdapter.setRestaurants(searchHistory.toList(), restaurantViewModel.latitude, restaurantViewModel.longitude, requireActivity(), requireParentFragment())
                 } else if (p0 != "" && searchHistory.size > 0) {
-                    restaurantAdapter.setRestaurants(searchHistory.toList(), restaurantViewModel.latitude, restaurantViewModel.longitude, requireActivity())
+                    restaurantAdapter.setRestaurants(searchHistory.toList(), restaurantViewModel.latitude, restaurantViewModel.longitude, requireActivity(), requireParentFragment())
                 } else {
-                    restaurantAdapter.setRestaurants(restaurantAdapter.restaurantList, restaurantViewModel.latitude, restaurantViewModel.longitude, requireActivity())
+                    restaurantAdapter.setRestaurants(restaurantAdapter.restaurantList, restaurantViewModel.latitude, restaurantViewModel.longitude, requireActivity(), requireParentFragment())
                 }
 
                 return false
@@ -105,7 +105,7 @@ class SearchFragment : Fragment() {
             override fun onQueryTextChange(p0: String?): Boolean {
                 //Start filtering the list as user start entering the characters
                 if(p0.equals("")) {
-                    restaurantAdapter.setRestaurants(restaurantAdapter.restaurantList, restaurantViewModel.latitude, restaurantViewModel.longitude, requireActivity())
+                    restaurantAdapter.setRestaurants(restaurantAdapter.restaurantList, restaurantViewModel.latitude, restaurantViewModel.longitude, requireActivity(), requireParentFragment())
                 }
                 return false
             }

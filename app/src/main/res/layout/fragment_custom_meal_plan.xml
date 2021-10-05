@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="customMealPlanViewModel"
+            type="com.bitswilpg2.mealdash.viewmodels.CustomMealPlanViewModel"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:background="#272828">
+
+        <club.cred.synth.views.ElevatedView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:neuCornerRadius="50dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <club.cred.synth.views.SynthImageButton
+            android:id="@+id/btnClose"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="30dp"
+            android:padding="10dp"
+            app:neuButtonRadius="28dp"
+            app:neuButtonType="elevated_soft"
+            app:srcCompat="@drawable/close"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Select Food Items for Custom Meal Plan"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnClose"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="30dp"
+            android:padding="10dp"
+            android:gravity="center_vertical"
+            android:textColor="@color/white"/>
+
+        <ProgressBar
+            android:id="@+id/progressDialog"
+            android:visibility="gone"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:layout_constraintTop_toTopOf="@id/itemsRecyclerView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:indeterminateTint="@color/white"
+            app:layout_constraintBottom_toBottomOf="@id/itemsRecyclerView"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/itemsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            tools:listitem="@layout/adapter_food_items"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintTop_toBottomOf="@id/title"
+            app:layout_constraintBottom_toTopOf="@id/btnGoToCart"/>
+
+        <club.cred.synth.views.SynthButton
+            app:neuButtonType="elevated_soft"
+            android:id="@+id/btnGoToCart"
+            android:layout_width="match_parent"
+            android:layout_marginBottom="10dp"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginTop="10dp"
+            android:text="Go to Cart"
+            android:onClick="@{() -> customMealPlanViewModel.goToCart()}"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

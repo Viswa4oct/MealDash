@@ -4,6 +4,7 @@ import android.content.Context
 import android.location.LocationManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
 import com.bitswilpg2.mealdash.network.models.CustomerDetails
 import com.bitswilpg2.mealdash.network.repository.RegisterRepository
 import com.bitswilpg2.mealdash.viewmodels.RegisterViewModel
@@ -16,12 +17,13 @@ class RegisterViewModelFactory(
     private val registerRepository: RegisterRepository,
     private val customerDetails: CustomerDetails,
     private val context: Context,
-    private val locationManager: LocationManager
+    private val locationManager: LocationManager,
+    private val navController: NavController
 ): ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return if (modelClass.isAssignableFrom(RegisterViewModel::class.java)) {
-            RegisterViewModel(this.registerRepository, this.customerDetails, this.context, this.locationManager) as T
+            RegisterViewModel(this.registerRepository, this.customerDetails, this.context, this.locationManager, this.navController) as T
         } else {
             throw IllegalArgumentException("ViewModel Not Found")
         }

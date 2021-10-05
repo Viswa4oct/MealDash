@@ -3,6 +3,7 @@ package com.bitswilpg2.mealdash.network.services
 import com.bitswilpg2.mealdash.network.models.CustomerDetails
 import com.bitswilpg2.mealdash.network.models.LoginDetails
 import okhttp3.ResponseBody
+import okhttp3.internal.http.hasBody
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -27,13 +28,13 @@ interface AuthenticationRetrofitService {
         fun getInstance() : AuthenticationRetrofitService {
             if (retrofitService == null) {
                 val retrofit = Retrofit.Builder()
-                    .baseUrl("http://192.168.0.105:8000/api/authentication/customer/")
+//                    .baseUrl("http://192.168.0.105:8000/api/authentication/customer/")
+                    .baseUrl("http://44.195.199.28:8000/api/authentication/customer/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
                 retrofitService = retrofit.create(AuthenticationRetrofitService::class.java)
             }
             return retrofitService!!
         }
-
     }
 }

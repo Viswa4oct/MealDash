@@ -6,6 +6,7 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
+import android.text.TextUtils
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,6 +14,7 @@ import androidx.navigation.NavController
 import com.bitswilpg2.mealdash.R
 import com.bitswilpg2.mealdash.network.models.LoginDetails
 import com.bitswilpg2.mealdash.network.repository.LoginRepository
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import java.util.*
 
@@ -28,7 +30,7 @@ class LoginViewModel(
 
     var email = MutableLiveData<String>()
     var password = MutableLiveData<String>()
-    private val errorMessage = MutableLiveData<String>()
+    val errorMessage = MutableLiveData<String>()
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         onError("Exception handled: ${throwable.localizedMessage}")
     }
@@ -39,16 +41,23 @@ class LoginViewModel(
         loading.value = true
         setCustomerDetails()
 
-        job = CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
-            val response = repository.loginCustomers(loginDetails)
-            withContext(Dispatchers.Main) {
-                if (response.isSuccessful) {
-                    navController.navigate(R.id.action_loginFragment_to_restaurantsFragment)
-                    loading.value = false
-                } else {
-                    onError("Registration Failed : ${response.message()} ")
+        if ((loginDetails.email.isNotEmpty() && loginDetails.email != "null") &&
+            (loginDetails.password.isNotEmpty() && loginDetails.password != "null")) {
+            job = CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
+                val response = repository.loginCustomers(loginDetails)
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        navController.navigate(R.id.action_loginFragment_to_restaurantsFragment)
+                        errorMessage.value = "Welcome " + loginDetails.name
+                        loading.value = false
+                    } else {
+                        onError("Login Failed : ${response.message()} ")
+                    }
                 }
             }
+        } else {
+            errorMessage.value = "Please enter valid credentials to continue."
+            loading.value = false
         }
     }
 

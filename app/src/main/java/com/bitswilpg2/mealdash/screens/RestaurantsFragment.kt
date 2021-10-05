@@ -63,7 +63,7 @@ class RestaurantsFragment : Fragment() {
         }
 
         restaurantViewModel.restaurant.observe(viewLifecycleOwner, {
-            restaurantAdapter.setRestaurants(it, restaurantViewModel.latitude, restaurantViewModel.longitude, requireActivity())
+            restaurantAdapter.setRestaurants(it, restaurantViewModel.latitude, restaurantViewModel.longitude, requireActivity(), requireParentFragment())
         })
 
         restaurantViewModel.loading.observe(viewLifecycleOwner, {

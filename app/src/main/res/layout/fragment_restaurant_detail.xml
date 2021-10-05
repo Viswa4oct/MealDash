@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="mealPlanItemsViewModel"
+            type="com.bitswilpg2.mealdash.viewmodels.RestaurantDetailViewModel"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:background="#272828">
+
+        <club.cred.synth.views.ElevatedView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:neuCornerRadius="50dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <club.cred.synth.views.SynthImageButton
+            android:id="@+id/btnClose"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="30dp"
+            android:padding="10dp"
+            app:neuButtonRadius="28dp"
+            app:neuButtonType="elevated_soft"
+            app:srcCompat="@drawable/close"/>
+
+        <club.cred.synth.views.SynthImageButton
+            android:id="@+id/btnRestaurantImage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnClose"
+            android:layout_width="match_parent"
+            android:layout_height="125dp"
+            android:layout_margin="30dp"
+            android:padding="10dp"
+            app:neuButtonType="elevated_soft"
+            app:srcCompat="@drawable/restaurant"/>
+
+        <LinearLayout
+            android:id="@+id/currentMealPlanDetails"
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="30dp"
+            android:paddingEnd="30dp"
+            android:paddingTop="30dp"
+            app:layout_constraintTop_toBottomOf="@id/btnRestaurantImage"
+            android:orientation="vertical">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Active MealPlan - MealPlan 001"
+                android:textColor="@color/white"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Item 1 - 2 Nos"
+                android:textColor="@color/white"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Item 2 - 3 Nos"
+                android:textColor="@color/white"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Duration - 30 Days"
+                android:textColor="@color/white"/>
+
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progressDialog"
+            android:visibility="gone"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:layout_constraintTop_toTopOf="@id/itemsRecyclerView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:indeterminateTint="@color/white"
+            app:layout_constraintBottom_toBottomOf="@id/itemsRecyclerView"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/itemsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            tools:listitem="@layout/adapter_meal_plan_items"
+            tools:itemCount="1"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintTop_toBottomOf="@id/currentMealPlanDetails"
+            app:layout_constraintBottom_toTopOf="@id/btnCustomMealPlan"/>
+
+        <club.cred.synth.views.SynthButton
+            app:neuButtonType="elevated_soft"
+            android:id="@+id/btnCustomMealPlan"
+            android:layout_width="match_parent"
+            android:layout_marginBottom="10dp"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginTop="10dp"
+            android:text="Make Custom Meal Plan"
+            android:onClick="@{() -> mealPlanItemsViewModel.goToCustomMealPlan()}"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

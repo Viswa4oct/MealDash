@@ -11,6 +11,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
+import com.bitswilpg2.mealdash.R
 import com.bitswilpg2.mealdash.network.models.CustomerDetails
 import com.bitswilpg2.mealdash.network.repository.RegisterRepository
 import kotlinx.coroutines.*
@@ -24,7 +26,8 @@ class RegisterViewModel(
     private val repository: RegisterRepository,
     private var customerDetails: CustomerDetails,
     private var context: Context,
-    private var locationManager: LocationManager
+    private var locationManager: LocationManager,
+    private var navController: NavController
 )  : ViewModel() {
 
     var name = MutableLiveData<String>()
@@ -34,19 +37,21 @@ class RegisterViewModel(
     var address = MutableLiveData<String>()
     var city = MutableLiveData<String>()
     var pincode = MutableLiveData<String>()
-    private val errorMessage = MutableLiveData<String>()
-    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        onError("Exception handled: ${throwable.localizedMessage}")
-    }
+    val errorMessage = MutableLiveData<String>()
+    var job: Job? = null
+    val loading = MutableLiveData<Boolean>()
 
     fun registerCustomers() {
+        loading.value = true
         setCustomerDetails()
 
-        CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
+        job = CoroutineScope(Dispatchers.IO).launch {
             val response = repository.registerCustomers(customerDetails)
             withContext(Dispatchers.Main) {
                 if (response.isSuccessful) {
-
+                    navController.navigate(R.id.action_registerFragment_to_loginFragment)
+                    errorMessage.value = "Registered Successfully. Please Login to continue."
+                    loading.value = false
                 } else {
                     onError("Registration Failed : ${response.message()} ")
                 }
@@ -66,6 +71,12 @@ class RegisterViewModel(
 
     private fun onError(message: String) {
         errorMessage.value = message
+        loading.value = false
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        job?.cancel()
     }
 
     fun fetchCityUsingGPSData() {
@@ -76,7 +87,7 @@ class RegisterViewModel(
             return
         else {
             val location: Location =
-                locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)!!
+                locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)!!
             val geocoder = Geocoder(context, Locale.getDefault())
             val addresses: List<Address> = geocoder.getFromLocation(location.latitude, location.longitude, 1)
             city.value = addresses[0].locality
